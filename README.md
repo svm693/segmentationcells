@@ -1,2 +1,3 @@
-# segmentationcells
-MATLAB program to segment cells from two connected channels
+# Cell segmentation using MATLAB
+
+It requires MATLAB R2017b and an updated GPU driver. 
