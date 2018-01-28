@@ -104,14 +104,16 @@ end
 
 %% EDGE DETECTION:
 
-sigma = 3;
+sigma = 10;
 smoothImage = imgaussfilt(HPF1,sigma);
 HPF2 = im2bw(smoothImage, 1);
 BW= bwareaopen(~HPF2, 10000, conndef(2, 'maximal'));
 
-%[~, threshold] = edge(BW, 'sobel');
-%fudgeFactor = .5;
-edge1 = edge(~BW,'log', 0);
+
+%...detecting borders...
+bwopen= bwareaopen(~BW, 100);
+BWperim= bwperim(bwopen);
+
 
 figure('Name', 'Steps toward Edge Detection')
 subplot(2,2,1)
@@ -124,7 +126,8 @@ subplot(2,2,3)
 imshow(~BW)
 title('BW')
 subplot(2,2,4)
-imshow(edge1)
+overlay= imoverlay(BW, BWperim, 'red');
+imshow(overlay);
 title('edge')
 
 % Removing connected components smaller than X pixels
