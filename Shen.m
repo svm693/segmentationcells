@@ -95,7 +95,7 @@ clear ans Cx Cy FFT2 FFTs HPF1 K K1 LPF M N X Y R
 HPF1= medfilt2(HPF);
 
 [N, M] = size(HPF1);
-gpuDevice();
+gpuDevice(1)
 for i=1:50:N-50
     for j=1:50:M-50
     HPF1(i:i+49, j:j+49)= denoiseImage(HPF1(i:i+49, j:j+49), net);
@@ -104,28 +104,28 @@ end
 
 %% EDGE DETECTION:
 
-sigma = 1.5;
+sigma = 3;
 smoothImage = imgaussfilt(HPF1,sigma);
-smoothGradient = imgradient(smoothImage, 'CentralDifference');
-HPF2 = im2bw(smoothGradient, 1);
+HPF2 = im2bw(smoothImage, 1);
+BW= bwareaopen(~HPF2, 10000, conndef(2, 'maximal'));
 
-BW= bwareaopen(HPF2, 10000, conndef(2, 'maximal'));
+%[~, threshold] = edge(BW, 'sobel');
+%fudgeFactor = .5;
+edge1 = edge(~BW,'log', 0);
 
-[~, threshold] = edge(BW, 'Prewitt');
-fudgeFactor = .5;
-edge1 = edge(BW,'sobel', threshold * fudgeFactor);
-
-
-figure('Name', 'CH2-->HPF-->Denoising-->Edge')
+figure('Name', 'Steps toward Edge Detection')
 subplot(2,2,1)
 imshow(ch2)
+title('ch2')
 subplot(2, 2, 2)
 imshow(HPF1)
+title('HPF1')
 subplot(2,2,3)
 imshow(~BW)
+title('BW')
 subplot(2,2,4)
 imshow(edge1)
-
+title('edge')
 
 % Removing connected components smaller than X pixels
 
