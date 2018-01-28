@@ -95,7 +95,7 @@ clear ans Cx Cy FFT2 FFTs HPF1 K K1 LPF M N X Y R
 HPF1= medfilt2(HPF);
 
 [N, M] = size(HPF1);
-reset(gpudev);
+gpuDevice();
 for i=1:50:N-50
     for j=1:50:M-50
     HPF1(i:i+49, j:j+49)= denoiseImage(HPF1(i:i+49, j:j+49), net);
@@ -103,17 +103,17 @@ for i=1:50:N-50
 end
 
 %% EDGE DETECTION:
-sigma = 2;
+
+sigma = 1.5;
 smoothImage = imgaussfilt(HPF1,sigma);
-smoothGradient = imgradient(smoothImage,'CentralDifference');
+smoothGradient = imgradient(smoothImage, 'CentralDifference');
 HPF2 = im2bw(smoothGradient, 1);
 
-BW= bwareaopen(~HPF2, 10000, conndef(2, 'maximal'));
+BW= bwareaopen(HPF2, 10000, conndef(2, 'maximal'));
 
-[~, threshold] = edge(~BW, 'Prewitt');
-fudgeFactor = .3;
-edge1 = edge(~BW,'sobel', threshold * fudgeFactor);
-
+[~, threshold] = edge(BW, 'Prewitt');
+fudgeFactor = .5;
+edge1 = edge(BW,'sobel', threshold * fudgeFactor);
 
 
 figure('Name', 'CH2-->HPF-->Denoising-->Edge')
