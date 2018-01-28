@@ -103,6 +103,10 @@ for i=1:50:N-50
 end
 
 %% EDGE DETECTION:
+% Aqui se hizo magia pero se logró. Esta parte agarra la foto en double 
+% la convierte en binaria luego de aplicar un gaussian filter. El delivery
+% de esta parte del código es los bordes (dale zoom) y la imagen lista para
+% calcular las intensidades usando BWperim
 
 sigma = 10;
 smoothImage = imgaussfilt(HPF1,sigma);
@@ -130,10 +134,7 @@ overlay= imoverlay(BW, BWperim, 'red');
 imshow(overlay);
 title('edge')
 
-% Removing connected components smaller than X pixels
-
-
-%figure('Name', 'Amount of noise reduced')
-%imshow(HPF1-HPF)
+% BWperim es lo que se va a usar para calcular las intensidades del channel
+% 1
 
 
