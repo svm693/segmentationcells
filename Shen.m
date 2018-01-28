@@ -1,4 +1,5 @@
 %{
+
 Sarah Aguasvivas Manzano
 
 MATLAB R2017b
@@ -42,8 +43,9 @@ clear;
 clc;
 %% Importing iamges to MATLAB environment:
 addpath('~/Desktop/');
-ch1= double(imread('Control-FL.tif'));
-ch2= double(imread('Control-BF.tif'));
+ch1= imread('Control-FL.tif');
+ch2= imread('Control-BF.tif');
+
 net= denoisingNetwork('DnCNN'); % using MATLAB's pretrained network for denoising
 
 %% PASSING CH2 THROUGH HPF:
@@ -90,27 +92,37 @@ clear ans Cx Cy FFT2 FFTs HPF1 K K1 LPF M N X Y R
 % pictures and applied the denoising. Since the initial layer of net is an 
 % image that is 50x50x1, I had to separate B2 into 50x50 squares due to 
 % memory problems
+HPF1= medfilt2(HPF);
 
-[N M] = size(HPF);
+[N, M] = size(HPF1);
 
 for i=1:50:N-50
-    for j=1:50:M-50    
-    HPF(i:i+49, j:j+49)= denoiseImage(HPF(i:i+49, j:j+49), net);
+    for j=1:50:M-50
+    HPF1(i:i+49, j:j+49)= denoiseImage(HPF1(i:i+49, j:j+49), net);
     end  
 end
 
-HPF(i:end, :)= denoiseImage(HPF(i:end, :), net);
-HPF(:, j:end)= denoiseImage(HPF(:, j:end), net);
-
 %% EDGE DETECTION:
+HPF1 = im2bw(HPF1, 1);
+notHPF1= ~HPF1;
 
-BW1= edge(B2, 'Prewitt');
+BW= bwareaopen(notHPF1, 1000, conndef(2, 'maximal'));
+edge1= edge(BW, 'canny');
 
-figure('Name', 'CH2-->HPF-->Edge')
-subplot(1,3,1)
+figure('Name', 'CH2-->HPF-->Denoising-->Edge')
+subplot(2,2,1)
 imshow(ch2)
-subplot(1, 3, 2)
-imshow(B2obj)
-subplot(1,3,3)
-imshow(BW1)
+subplot(2, 2, 2)
+imshow(HPF1)
+subplot(2,2,3)
+imshow(BW)
+subplot(2,2,4)
+imshow(edge1)
+
+% Removing connected components smaller than X pixels
+
+
+%figure('Name', 'Amount of noise reduced')
+%imshow(HPF1-HPF)
+
 
