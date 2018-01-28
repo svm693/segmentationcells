@@ -106,8 +106,12 @@ end
 HPF1 = im2bw(HPF1, 1);
 notHPF1= ~HPF1;
 
-BW= bwareaopen(notHPF1, 1000, conndef(2, 'maximal'));
-edge1= edge(BW, 'canny');
+BW= bwareaopen(notHPF1, 10000, conndef(2, 'maximal'));
+
+[~, threshold] = edge(BW, 'sobel');
+fudgeFactor = .5;
+BWs = edge(BW,'sobel', threshold * fudgeFactor);
+
 
 figure('Name', 'CH2-->HPF-->Denoising-->Edge')
 subplot(2,2,1)
@@ -115,7 +119,7 @@ imshow(ch2)
 subplot(2, 2, 2)
 imshow(HPF1)
 subplot(2,2,3)
-imshow(BW)
+imshow(~BW)
 subplot(2,2,4)
 imshow(edge1)
 
