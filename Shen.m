@@ -101,8 +101,6 @@ HPF1= medfilt2(HPF);
 tic
 gpuDevice();
 
-HPF1=uint8(HPF1);
-
 for i=1:255:N-255
     for j=1:255:M-255
         HPF1(i:i+254, j:j+254)= denoiseImage(HPF1(i:i+254, j:j+254), net);
