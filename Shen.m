@@ -41,12 +41,15 @@ a Mac OS Sierra with CUDA and these specs from gpuDevice
 
 clear;
 clc;
-%% Importing iamges to MATLAB environment:
+
+%%% Importing iamges to MATLAB environment:
 addpath('~/Desktop/');
 ch1= imread('Control-FL.tif');
 ch2= imread('Control-BF.tif');
+% Making images smaller:
 
-net= denoisingNetwork('DnCNN'); % using MATLAB's pretrained network for denoising
+net= denoisingNetwork('dncnn'); % using MATLAB's pretrained network for denoising
+
 
 %% PASSING CH2 THROUGH HPF:
 
@@ -95,13 +98,18 @@ clear ans Cx Cy FFT2 FFTs HPF1 K K1 LPF M N X Y R
 HPF1= medfilt2(HPF);
 
 [N, M] = size(HPF1);
-gpuDevice(1)
-for i=1:50:N-50
-    for j=1:50:M-50
-    HPF1(i:i+49, j:j+49)= denoiseImage(HPF1(i:i+49, j:j+49), net);
-    end  
+tic
+gpuDevice();
+
+HPF1=uint8(HPF1);
+
+for i=1:255:N-255
+    for j=1:255:M-255
+        HPF1(i:i+254, j:j+254)= denoiseImage(HPF1(i:i+254, j:j+254), net);
+    end
 end
 
+toc
 %% EDGE DETECTION:
 % Aqui se hizo magia pero se logró. Esta parte agarra la foto en double 
 % la convierte en binaria luego de aplicar un gaussian filter. El delivery
@@ -117,11 +125,12 @@ BW= bwareaopen(~HPF2, 10000, conndef(2, 'maximal'));
 %...detecting borders...
 bwopen= bwareaopen(~BW, 100);
 BWperim= bwperim(bwopen);
-
-
+%%
+ch2=uint8(ch2);
 figure('Name', 'Steps toward Edge Detection')
 subplot(2,2,1)
-imshow(ch2)
+overlay1= imoverlay(ch2, BWperim, 'white');
+imshow(overlay1)
 title('ch2')
 subplot(2, 2, 2)
 imshow(HPF1)
@@ -133,6 +142,9 @@ subplot(2,2,4)
 overlay= imoverlay(BW, BWperim, 'red');
 imshow(overlay);
 title('edge')
+
+figure()
+imshow(overlay1);
 
 % BWperim es lo que se va a usar para calcular las intensidades del channel
 % 1
