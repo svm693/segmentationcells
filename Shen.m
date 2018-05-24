@@ -209,7 +209,7 @@ tBFseg=trainNetwork(trainingData,BFsegNet,opts);
 % test net through imds and pxds
 % view: https://www.mathworks.com/help/vision/ug/semantic-segmentation-examples.html#mw_9ca2a7be-c8c2-4bbf-b168-128261d1be7d
 
-testI=readimage(imds,7);
+testI=readimage(imds,vVector(2));
 testC=semanticseg(testI,tBFseg);
 B=labeloverlay(testI,testC);
 figure
